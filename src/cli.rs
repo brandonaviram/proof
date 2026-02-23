@@ -27,6 +27,10 @@ pub struct Cli {
     #[arg(short, long)]
     pub output: Option<PathBuf>,
 
+    /// Auto-rotate thumbnails using EXIF orientation
+    #[arg(long)]
+    pub auto_orient: bool,
+
     /// Only output asset manifest to stdout (skip PDF)
     #[arg(long)]
     pub manifest_only: bool,

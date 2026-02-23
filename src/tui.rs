@@ -105,11 +105,13 @@ pub fn run(cli: Cli) -> Result<()> {
         std::path::PathBuf::from(format!("{slug}-delivery-{date}.pdf"))
     });
 
+    let auto_orient = cli.auto_orient;
     let config = pdf::PdfConfig {
         client: client.clone(),
         title: cli.title.clone(),
         date: date.clone(),
         columns,
+        auto_orient,
     };
 
     let (tx, rx) = mpsc::channel::<Msg>();
@@ -258,7 +260,7 @@ fn pipeline(
     for (i, (path, kind)) in found.iter().enumerate() {
         let _ = tx.send(Msg::Processing { index: i });
 
-        match scan::process_one(path, *kind, thumb_dir.path(), i, true) {
+        match scan::process_one(path, *kind, thumb_dir.path(), i, true, config.auto_orient) {
             Ok(asset) => {
                 let _ = tx.send(Msg::Processed { index: i });
                 assets.push(asset);

@@ -10,6 +10,7 @@ pub struct PdfConfig {
     pub title: Option<String>,
     pub date: String,
     pub columns: u8,
+    pub auto_orient: bool,
 }
 
 pub fn render(assets: &[Asset], config: &PdfConfig, output: &Path) -> Result<()> {
@@ -86,6 +87,7 @@ struct TemplateData {
     title: Option<String>,
     date: String,
     columns: u8,
+    auto_orient: bool,
     summary: Summary,
     assets: Vec<AssetEntry>,
 }
@@ -148,6 +150,7 @@ fn build_data(assets: &[Asset], config: &PdfConfig) -> TemplateData {
         title: config.title.clone(),
         date: config.date.clone(),
         columns: config.columns,
+        auto_orient: config.auto_orient,
         summary: Summary {
             total_files: assets.len(),
             total_size: humansize::format_size(total_size, humansize::BINARY),

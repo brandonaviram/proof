@@ -46,7 +46,7 @@ fn run() -> Result<()> {
 
     let gen_thumbnails = !cli.manifest_only;
     let thumb_dir = tempfile::tempdir()?;
-    let (assets, errors) = scan::process_all(&found, thumb_dir.path(), gen_thumbnails);
+    let (assets, errors) = scan::process_all(&found, thumb_dir.path(), gen_thumbnails, cli.auto_orient);
 
     if !errors.is_empty() {
         eprintln!("\n{} files skipped:", errors.len());
@@ -85,6 +85,7 @@ fn run() -> Result<()> {
         title: cli.title,
         date,
         columns: cli.columns,
+        auto_orient: cli.auto_orient,
     };
 
     eprintln!("Generating PDF...");

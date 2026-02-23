@@ -96,6 +96,7 @@ pub fn process_all(
     assets: &[(PathBuf, AssetKind)],
     thumb_dir: &Path,
     gen_thumbnails: bool,
+    auto_orient: bool,
 ) -> (Vec<Asset>, Vec<String>) {
     eprintln!("Processing {} assets...", assets.len());
 
@@ -103,7 +104,7 @@ pub fn process_all(
         .par_iter()
         .enumerate()
         .map(|(i, (path, kind))| {
-            process_one(path, *kind, thumb_dir, i, gen_thumbnails)
+            process_one(path, *kind, thumb_dir, i, gen_thumbnails, auto_orient)
         })
         .collect();
 
@@ -128,6 +129,7 @@ pub fn process_one(
     thumb_dir: &Path,
     index: usize,
     gen_thumbnails: bool,
+    auto_orient: bool,
 ) -> Result<Asset> {
     let filename = path
         .file_name()
@@ -160,7 +162,7 @@ pub fn process_one(
     };
 
     match kind {
-        AssetKind::Image => process_image(&mut asset, path, thumb_dir, index, gen_thumbnails)?,
+        AssetKind::Image => process_image(&mut asset, path, thumb_dir, index, gen_thumbnails, auto_orient)?,
         AssetKind::Video => process_video(&mut asset, path, thumb_dir, index, gen_thumbnails),
     }
 
@@ -173,10 +175,16 @@ fn process_image(
     thumb_dir: &Path,
     index: usize,
     gen_thumbnails: bool,
+    auto_orient: bool,
 ) -> Result<()> {
     if gen_thumbnails {
         let img = image::open(path)
             .with_context(|| format!("cannot decode '{}'", path.display()))?;
+        let img = if auto_orient {
+            apply_orientation(img, read_exif_orientation(path))
+        } else {
+            img
+        };
         let (w, h) = img.dimensions();
         asset.width = Some(w);
         asset.height = Some(h);
@@ -195,6 +203,30 @@ fn process_image(
 
     read_exif(asset, path);
     Ok(())
+}
+
+fn read_exif_orientation(path: &Path) -> u32 {
+    let Ok(file) = std::fs::File::open(path) else { return 1 };
+    let mut reader = std::io::BufReader::new(file);
+    let Ok(exif_data) = exif::Reader::new().read_from_container(&mut reader) else { return 1 };
+
+    exif_data
+        .get_field(exif::Tag::Orientation, exif::In::PRIMARY)
+        .and_then(|f| f.value.get_uint(0))
+        .unwrap_or(1)
+}
+
+fn apply_orientation(img: image::DynamicImage, orientation: u32) -> image::DynamicImage {
+    match orientation {
+        2 => img.fliph(),
+        3 => img.rotate180(),
+        4 => img.flipv(),
+        5 => img.rotate90().fliph(),
+        6 => img.rotate90(),
+        7 => img.rotate270().fliph(),
+        8 => img.rotate270(),
+        _ => img,
+    }
 }
 
 fn read_exif(asset: &mut Asset, path: &Path) {

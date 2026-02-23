@@ -55,21 +55,42 @@
 
 #let cols = data.columns
 
+#let cell-height = 110pt
+
 #let make-cell(asset) = block(breakable: false)[
-  #box(
-    width: 100%,
-    clip: true,
-    radius: 2pt,
-    stroke: 0.5pt + luma(220),
-  )[
-    #if asset.thumbnail != none {
-      image(asset.thumbnail, width: 100%)
-    } else {
-      rect(width: 100%, height: 50pt, fill: luma(245))[
-        #align(center + horizon, text(7pt, fill: luma(160))[No preview])
+  #if data.auto_orient {
+    box(
+      width: 100%,
+      height: cell-height,
+      clip: true,
+      radius: 2pt,
+      stroke: 0.5pt + luma(220),
+      fill: luma(250),
+    )[
+      #align(center + horizon)[
+        #if asset.thumbnail != none {
+          image(asset.thumbnail, height: cell-height, fit: "contain")
+        } else {
+          text(7pt, fill: luma(160))[No preview]
+        }
       ]
-    }
-  ]
+    ]
+  } else {
+    box(
+      width: 100%,
+      clip: true,
+      radius: 2pt,
+      stroke: 0.5pt + luma(220),
+    )[
+      #if asset.thumbnail != none {
+        image(asset.thumbnail, width: 100%)
+      } else {
+        rect(width: 100%, height: 50pt, fill: luma(245))[
+          #align(center + horizon, text(7pt, fill: luma(160))[No preview])
+        ]
+      }
+    ]
+  }
   #v(3pt)
   #text(6pt, fill: luma(100))[#asset.filename]
 ]
