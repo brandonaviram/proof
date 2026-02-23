@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>proof. Delivery documentation for creative agencies.</title>
+  <meta name="description" content="CLI that generates branded delivery proof PDFs from a folder of finals. Cover page, contact sheet, manifest table. Apercu Pro typography. One command.">
+  <meta name="author" content="Brandon Aviram">
+  <meta property="og:title" content="proof. Your folder already knows what's in it.">
+  <meta property="og:description" content="CLI that generates branded delivery proof PDFs from a folder of finals. One command. Zero configuration. Apercu Pro.">
+  <meta property="og:type" content="website">
+  <style>
+    :root {
+      --black: #1A1A1A;
+      --dark-gray: #4A4A4A;
+      --mid-gray: #787878;
+      --light-gray: #C8C8C8;
+      --near-white: #F5F5F5;
+      --paper: #FFFFFF;
+      --cyan: #56B6C2;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      color: var(--black);
+      background: var(--paper);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ── Hero ────────────────────────────── */
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .hero-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--mid-gray);
+      margin-bottom: 2.5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-weight: 300;
+      line-height: 1.4;
+      max-width: 600px;
+      color: var(--black);
+    }
+
+    .hero h1 strong {
+      font-weight: 400;
+    }
+
+    .hero-sub {
+      font-size: 0.95rem;
+      color: var(--mid-gray);
+      margin-top: 1.5rem;
+    }
+
+    .hero-rule {
+      width: 120px;
+      height: 1px;
+      background: var(--light-gray);
+      margin: 3rem auto;
+      border: none;
+    }
+
+    .hero-terminal {
+      background: #1e1e1e;
+      border-radius: 8px;
+      padding: 1.5rem 2rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: left;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+    }
+
+    .hero-terminal .prompt { color: var(--cyan); }
+    .hero-terminal .cmd { color: #d4d4d4; }
+    .hero-terminal .flag { color: #9cdcfe; }
+    .hero-terminal .string { color: #ce9178; }
+    .hero-terminal .output { color: #6a9955; }
+
+    /* ── Sections ────────────────────────── */
+
+    section {
+      padding: 6rem 2rem;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--light-gray);
+      margin-bottom: 2rem;
+    }
+
+    /* ── Output Section ──────────────────── */
+
+    .output-section {
+      background: var(--near-white);
+    }
+
+    .output-section h2 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--black);
+      margin-bottom: 0.5rem;
+    }
+
+    .output-section p {
+      font-size: 0.9rem;
+      color: var(--dark-gray);
+      margin-bottom: 3rem;
+      max-width: 480px;
+    }
+
+    .pdf-pages {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .pdf-page {
+      background: var(--paper);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.06),
+        0 8px 24px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .pdf-page:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.08),
+        0 16px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .pdf-page img {
+      width: 100%;
+      display: block;
+    }
+
+    .pdf-page-label {
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--mid-gray);
+      letter-spacing: 0.05em;
+      border-top: 1px solid var(--near-white);
+    }
+
+    /* ── How It Works ────────────────────── */
+
+    .how-section h2 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--black);
+      margin-bottom: 2.5rem;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+    }
+
+    .step-number {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      color: var(--light-gray);
+      margin-bottom: 0.75rem;
+    }
+
+    .step h3 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--black);
+      margin-bottom: 0.5rem;
+    }
+
+    .step p {
+      font-size: 0.85rem;
+      color: var(--dark-gray);
+      line-height: 1.6;
+    }
+
+    /* ── Install ─────────────────────────── */
+
+    .install-section {
+      background: var(--near-white);
+    }
+
+    .install-section h2 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--black);
+      margin-bottom: 2rem;
+    }
+
+    .install-blocks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      max-width: 640px;
+    }
+
+    .install-block {
+      background: #1e1e1e;
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: #d4d4d4;
+      line-height: 1.6;
+    }
+
+    .install-block .comment {
+      color: #6a9955;
+    }
+
+    .install-block .cmd {
+      color: #d4d4d4;
+    }
+
+    /* ── Options ──────────────────────────── */
+
+    .options-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .options-table th {
+      text-align: left;
+      font-weight: 500;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      color: var(--mid-gray);
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--light-gray);
+    }
+
+    .options-table td {
+      padding: 0.6rem 1rem;
+      color: var(--dark-gray);
+      border-bottom: 1px solid var(--near-white);
+    }
+
+    .options-table td:first-child {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: var(--black);
+      white-space: nowrap;
+    }
+
+    .options-table td:last-child {
+      color: var(--mid-gray);
+    }
+
+    .options-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* ── Footer ───────────────────────────── */
+
+    footer {
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    footer .rule {
+      width: 100%;
+      max-width: 960px;
+      height: 1px;
+      background: var(--near-white);
+      margin: 0 auto 3rem;
+      border: none;
+    }
+
+    .footer-stack {
+      font-size: 0.8rem;
+      color: var(--mid-gray);
+      line-height: 2;
+    }
+
+    .footer-stack a {
+      color: var(--dark-gray);
+      text-decoration: none;
+      border-bottom: 1px solid var(--light-gray);
+      transition: border-color 0.15s;
+    }
+
+    .footer-stack a:hover {
+      border-color: var(--dark-gray);
+    }
+
+    .built-with {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--light-gray);
+      letter-spacing: 0.02em;
+    }
+
+    .built-with a {
+      color: var(--light-gray);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .built-with a:hover {
+      color: var(--mid-gray);
+      border-bottom-color: var(--light-gray);
+    }
+
+    .built-with .separator {
+      margin: 0 0.3em;
+      opacity: 0.5;
+    }
+
+    /* ── Responsive ───────────────────────── */
+
+    @media (max-width: 768px) {
+      .pdf-pages {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .steps {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .install-blocks {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-terminal {
+        font-size: 0.75rem;
+        padding: 1.25rem 1.5rem;
+      }
+
+      section {
+        padding: 4rem 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 {
+        font-size: 1.4rem;
+      }
+
+      .options-table {
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-label">proof</div>
+    <h1>Your folder already knows what's in it. <strong>proof</strong> just makes it official.</h1>
+    <p class="hero-sub">One command. Zero configuration. Apercu Pro.</p>
+    <hr class="hero-rule">
+    <div class="hero-terminal">
+      <div><span class="prompt">$</span> <span class="cmd">proof ./finals</span> <span class="flag">--client</span> <span class="string">"Armani"</span> <span class="flag">--title</span> <span class="string">"SS26 Campaign"</span></div>
+      <div style="margin-top: 0.75rem;"><span class="output">Done: armani-delivery-2026-02-23.pdf (189 assets)</span></div>
+    </div>
+  </div>
+
+  <!-- Output -->
+  <section class="output-section">
+    <div class="container">
+      <div class="section-label">The Output</div>
+      <h2>The PDF is the product.</h2>
+      <p>Cover page, contact sheet, manifest table, summary. All typeset in Apercu Pro. All derived from the files themselves.</p>
+      <div class="pdf-pages">
+        <div class="pdf-page">
+          <img src="images/cover.jpg" alt="Cover page showing client name, title, date, and file count" loading="lazy">
+          <div class="pdf-page-label">Cover Page</div>
+        </div>
+        <div class="pdf-page">
+          <img src="images/contact-sheet.jpg" alt="Contact sheet showing thumbnail grid of delivered images" loading="lazy">
+          <div class="pdf-page-label">Contact Sheet</div>
+        </div>
+        <div class="pdf-page">
+          <img src="images/manifest.jpg" alt="Manifest table showing filename, type, resolution, format, and size" loading="lazy">
+          <div class="pdf-page-label">Manifest</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-section">
+    <div class="container">
+      <div class="section-label">How It Works</div>
+      <h2>Point it at a directory. Get a PDF.</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">01</div>
+          <h3>Scan</h3>
+          <p>proof discovers every image and video in the directory. JPG, PNG, TIFF, WebP, MP4, MOV, MXF. Natural sort order.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">02</div>
+          <h3>Extract</h3>
+          <p>Metadata read from every file. Resolution, format, color space, file size. Video gets duration and codec via ffprobe. Thumbnails generated in parallel.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">03</div>
+          <h3>Render</h3>
+          <p>A single PDF compiled via Typst. Cover page with client and date. Contact sheet grid. Manifest table with alternating rows. Summary line. Apercu Pro throughout.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Install -->
+  <section class="install-section">
+    <div class="container">
+      <div class="section-label">Install</div>
+      <h2>Two commands.</h2>
+      <div class="install-blocks">
+        <div class="install-block">
+          <div class="comment"># Install proof</div>
+          <div class="cmd">cargo install --path .</div>
+        </div>
+        <div class="install-block">
+          <div class="comment"># Requires Typst</div>
+          <div class="cmd">brew install typst</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Options -->
+  <section>
+    <div class="container">
+      <div class="section-label">Options</div>
+      <table class="options-table">
+        <thead>
+          <tr>
+            <th>Flag</th>
+            <th>Description</th>
+            <th>Default</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>--client</td>
+            <td>Client name on cover page</td>
+            <td>Delivery</td>
+          </tr>
+          <tr>
+            <td>--title</td>
+            <td>Document title</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>--date</td>
+            <td>Delivery date</td>
+            <td>today</td>
+          </tr>
+          <tr>
+            <td>--columns</td>
+            <td>Contact sheet columns (3-8)</td>
+            <td>4</td>
+          </tr>
+          <tr>
+            <td>-o, --output</td>
+            <td>Output PDF path</td>
+            <td>{client}-delivery-{date}.pdf</td>
+          </tr>
+          <tr>
+            <td>--auto-orient</td>
+            <td>Rotate thumbnails per EXIF</td>
+            <td>off</td>
+          </tr>
+          <tr>
+            <td>--manifest-only</td>
+            <td>TSV manifest to stdout</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>--no-tui</td>
+            <td>Plain text instead of TUI</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <hr class="rule">
+    <div class="footer-stack">
+      <div>Built for creative agencies that treat the last mile with the same discipline as the first.</div>
+      <div style="margin-top: 1rem;"><a href="https://github.com/brandonaviram/proof">GitHub</a></div>
+    </div>
+    <div class="built-with">
+      <a href="https://www.rust-lang.org/">Rust</a>
+      <span class="separator">/</span>
+      <a href="https://typst.app">Typst</a>
+      <span class="separator">/</span>
+      <a href="https://ratatui.rs">ratatui</a>
+      <span class="separator">/</span>
+      <a href="https://github.com/rayon-rs/rayon">rayon</a>
+      <span class="separator">/</span>
+      <a href="https://claude.ai/claude-code">Claude Code</a>
+    </div>
+  </footer>
+
+</body>
+</html>
