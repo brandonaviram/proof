@@ -2,7 +2,6 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use image::GenericImageView;
-use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use serde::Serialize;
 
@@ -98,26 +97,15 @@ pub fn process_all(
     thumb_dir: &Path,
     gen_thumbnails: bool,
 ) -> (Vec<Asset>, Vec<String>) {
-    let pb = ProgressBar::new(assets.len() as u64);
-    pb.set_style(
-        ProgressStyle::default_bar()
-            .template("{spinner:.green} [{bar:40.cyan/blue}] {pos}/{len} {msg}")
-            .unwrap()
-            .progress_chars("##-"),
-    );
-    pb.set_message("Processing assets...");
+    eprintln!("Processing {} assets...", assets.len());
 
     let results: Vec<Result<Asset>> = assets
         .par_iter()
         .enumerate()
         .map(|(i, (path, kind))| {
-            let result = process_one(path, *kind, thumb_dir, i, gen_thumbnails);
-            pb.inc(1);
-            result
+            process_one(path, *kind, thumb_dir, i, gen_thumbnails)
         })
         .collect();
-
-    pb.finish_and_clear();
 
     let mut processed = Vec::new();
     let mut errors = Vec::new();

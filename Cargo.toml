@@ -13,7 +13,6 @@ crossterm = "0.29.0"
 exif = { package = "kamadak-exif", version = "0.5" }
 humansize = "2.1"
 image = { version = "0.25", default-features = false, features = ["jpeg", "png", "tiff", "webp"] }
-indicatif = "0.17"
 natord = "1.0"
 ratatui = "0.30.0"
 rayon = "1.10"

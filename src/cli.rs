@@ -31,14 +31,6 @@ pub struct Cli {
     #[arg(long)]
     pub manifest_only: bool,
 
-    /// Show what would be processed without generating output
-    #[arg(long)]
-    pub dry_run: bool,
-
-    /// Verbose output
-    #[arg(short, long)]
-    pub verbose: bool,
-
     /// Disable TUI dashboard (use plain text output)
     #[arg(long)]
     pub no_tui: bool,

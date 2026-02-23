@@ -16,8 +16,8 @@ fn main() {
 fn run() -> Result<()> {
     let cli = cli::Cli::parse();
 
-    // TUI mode is default unless --no-tui, --dry-run, or --manifest-only
-    if !cli.no_tui && !cli.dry_run && !cli.manifest_only {
+    // TUI mode is default unless --no-tui or --manifest-only
+    if !cli.no_tui && !cli.manifest_only {
         return tui::run(cli);
     }
 
@@ -43,13 +43,6 @@ fn run() -> Result<()> {
         image_count,
         video_count
     );
-
-    if cli.dry_run {
-        for (path, kind) in &found {
-            println!("{:<6} {}", format!("{}", kind), path.display());
-        }
-        return Ok(());
-    }
 
     let gen_thumbnails = !cli.manifest_only;
     let thumb_dir = tempfile::tempdir()?;
