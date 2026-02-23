@@ -30,8 +30,8 @@ proof ./finals --client "Aviram" --no-tui
 # Custom columns and output path
 proof ./finals --client "Vogue" --columns 6 -o vogue-delivery.pdf
 
-# Dry run — list discovered assets
-proof ./finals --dry-run
+# Auto-rotate thumbnails using EXIF orientation
+proof ./finals --client "Armani" --auto-orient
 
 # Manifest only — TSV to stdout
 proof ./finals --manifest-only
@@ -46,10 +46,9 @@ proof ./finals --manifest-only
 | `--date` | Delivery date | today |
 | `--columns` | Contact sheet columns (3-8) | `4` |
 | `-o, --output` | Output PDF path | `{client}-delivery-{date}.pdf` |
+| `--auto-orient` | Rotate thumbnails using EXIF orientation | off |
 | `--manifest-only` | TSV manifest to stdout | |
-| `--dry-run` | List files without processing | |
 | `--no-tui` | Plain text instead of TUI | |
-| `-v, --verbose` | Verbose output | |
 
 ## PDF Output
 
